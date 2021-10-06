@@ -20,10 +20,14 @@ export function SubscribeButton(props: SubscribeButtonProps) {
             return;
         }
         try {
+            // efetua consumo que cria o checkou do stripe 
             const response = await api.post('/subscribe');
+            // pega o id do checkout
             const { sessionId } = response.data;
-        }
 
+        } catch {
+
+        }
     }
 
     return (
