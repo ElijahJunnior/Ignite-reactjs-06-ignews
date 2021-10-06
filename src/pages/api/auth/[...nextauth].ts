@@ -1,8 +1,6 @@
 import { query as q, query } from 'faunadb';
-
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
-import { FaUnderline } from 'react-icons/fa';
 import { fauna } from '../../../services/fauna';
 
 export default NextAuth({
