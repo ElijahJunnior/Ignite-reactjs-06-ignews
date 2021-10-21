@@ -3,6 +3,7 @@ import { send } from "process";
 import { Readable } from 'stream';
 import Stripe from 'stripe';
 import { stripe } from "../../services/stripe";
+import { saveSubscription } from "./_lib/manageSubscription";
 
 // função usada para transformar uma requisição stream em linear
 async function buffer(readable: Readable) {
@@ -42,9 +43,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         } catch (err) {
             return res.status(400).send(`Webhook error ${err.message}`);
         }
+        // descostroi o evento para pegar o seu tipo
+        const { type } = event;
         // verifica se o evento do stripe esta na lista de eventos suportados
         if (relevantEvents.has(event.type)) {
-            console.log('Evento recebido::::', event);
+            try {
+                switch (type) {
+                    case 'checkout.session.completed':
+                        // extrai do objeto generico de evento os dados tipados da CheckoutSession
+                        const checkoutSession = event.data.object as Stripe.Checkout.Session;
+                        // chama a função que vai gravar o subscription no banco de dados
+                        await saveSubscription(
+                            checkoutSession.subscription.toString(),
+                            checkoutSession.customer.toString()
+                        );
+                        break;
+                    default:
+                        throw new Error('Unhandled event.');
+                }
+            } catch (err) {
+                console.log('revelantsEventsError:', err);
+                return res.json({ error: 'Webhook handler failed.' });
+            }
         }
         // retorno da requisição
         res.send({ received: true });
