@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { send } from "process";
 import { Readable } from 'stream';
 import Stripe from 'stripe';
 import { stripe } from "../../services/stripe";
@@ -25,7 +24,9 @@ export const config = {
 }
 
 const relevantEvents = new Set([
-    'checkout.session.completed'
+    'checkout.session.completed',
+    'customer.subscription.updated',
+    'customer.subscription.deleted',
 ]);
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -52,10 +53,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     case 'checkout.session.completed':
                         // extrai do objeto generico de evento os dados tipados da CheckoutSession
                         const checkoutSession = event.data.object as Stripe.Checkout.Session;
-                        // chama a função que vai gravar o subscription no banco de dados
+                        // grava o subscription no banco de dados
                         await saveSubscription(
                             checkoutSession.subscription.toString(),
-                            checkoutSession.customer.toString()
+                            checkoutSession.customer.toString(),
+                            true
+                        );
+                        break;
+                    case 'customer.subscription.updated':
+                    case 'customer.subscription.deleted':
+                        // extrai do objeto generico de evento os dados tipados da Subscription    
+                        const subscription = event.data.object as Stripe.Subscription;
+                        // atualiza os dados da subscription no banco de dados
+                        await saveSubscription(
+                            subscription.id,
+                            subscription.customer.toString(),
                         );
                         break;
                     default:
