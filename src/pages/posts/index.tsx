@@ -2,10 +2,21 @@ import styles from './styles.module.scss';
 import Head from 'next/head';
 import { GetStaticProps } from 'next';
 import Prismic from '@prismicio/client';
+import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../../services/prismic';
 
+type Post = {
+    slug: string,
+    title: string,
+    excerpt: string,
+    updatedAt: string
+}
 
-export default function Posts() {
+type PostsProps = {
+    posts: Post[]
+}
+
+export default function Posts({ posts }: PostsProps) {
 
     return (
         <>
@@ -14,21 +25,15 @@ export default function Posts() {
             </Head>
             <main className={styles.container}>
                 <div className={styles.posts}>
-                    <a href='#'>
-                        <time>12 de março de 2021</time>
-                        <strong> Creating a Monorepo with Learna e Yarn Workspace</strong>
-                        <p> On this guide, you will larn how to creating a Monorepo with Learna e Yarn Workspace </p>
-                    </a>
-                    <a href='#'>
-                        <time>12 de março de 2021</time>
-                        <strong> Creating a Monorepo with Learna e Yarn Workspace</strong>
-                        <p> On this guide, you will larn how to creating a Monorepo with Learna e Yarn Workspace </p>
-                    </a>
-                    <a href='#'>
-                        <time>12 de março de 2021</time>
-                        <strong> Creating a Monorepo with Learna e Yarn Workspace</strong>
-                        <p> On this guide, you will larn how to creating a Monorepo with Learna e Yarn Workspace </p>
-                    </a>
+                    {
+                        posts.map(post => (
+                            <a key={post.slug} href='#'>
+                                <time>{post.updatedAt}</time>
+                                <strong>{post.title}</strong>
+                                <p>{post.excerpt}</p>
+                            </a>
+                        ))
+                    }
                 </div>
             </main>
         </>
@@ -37,7 +42,9 @@ export default function Posts() {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+    // função que monta um cliente prismic 
     const prismic = getPrismicClient()
+    // busca no prismic 100 documentos do tipo personalizado posts
     const response = await prismic.query(
         [
             Prismic.predicates.at('document.type', 'posts')
@@ -47,8 +54,26 @@ export const getStaticProps: GetStaticProps = async () => {
             pageSize: 100
         }
     )
-    // console.log("resultodo_carregamento_prismic::::", JSON.stringify(response, null, 2));
+    // cria um novo objeto com os posts formatados para atender a necessidade da pagina 
+    const posts = response.results.map(post => {
+        return {
+            slug: post.uid,
+            // função RichText do prismic que permite capturar os dados direto em texto ou html
+            title: RichText.asText(post.data.title),
+            // como a pagina só precisa do primeiro paragrafo, a função varre o conteudo buscando um
+            excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+            // formata a data de acordo com a necessidadde da pagina
+            updatedAt: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            })
+        };
+    });
+    // retorna o conteudo para a pagina   
     return {
-        props: {}
+        props: {
+            posts
+        }
     }
 }
