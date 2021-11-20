@@ -36,22 +36,41 @@ export default function Post({ post }: PostProps) {
     )
 }
 
+// será usada o ServerSidaGeneration para que a pagina seja montada de forma dinamica 
+// isso é necessário para permitir que apenas os usuarios logados e inscritos possam acessar os posts
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
 
-    const session = await getSession({ req });
+    // pega os parametros passados por query para a pagina
     const { slug } = params;
 
-    // if(!session) {
+    // pega a contexto session criado pelo nextAuth
+    const session = await getSession({ req });
 
-    // }
+    // verfica se o usuario está logado e se está co a inscrição ativa
+    if (!session || !session.activeSubscription) {
+        // caso o usuario não atenda aos requisitos o redireciona para a pagina home
+        return {
+            redirect: {
+                destination: '/',
+                // informa aos buscadores que o redirecionamento está ocorrendo por causa
+                // da regra de negocios é não porque a pagina deixou de existir
+                permanent: false
+            }
+        }
+    }
 
+    // instancia o cliente do Prismic
     const prismic = getPrismicClient(req);
+    // busca no prismic o post passado por parametro 
     const response = await prismic.getByUID('posts', String(slug), {});
-
+    // formata o post para que ele possa ser exibido pela pagina
     const post = {
         slug,
+        // tratamento do prismic para trazer o conteudo em forma de texto
         title: RichText.asText(response.data.title),
+        // tratamento do prismic para trazer o conteudo em forma de html
         content: RichText.asHtml(response.data.content),
+        // formatação de data
         updatedAt: new Date(response.last_publication_date).toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: 'long',
@@ -59,6 +78,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
         })
     }
 
+    // retorna o conteudo já tratado para ser exibido
     return {
         props: {
             post,
