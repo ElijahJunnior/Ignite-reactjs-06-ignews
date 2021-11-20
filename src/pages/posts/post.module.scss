@@ -42,8 +42,11 @@
         pre {
             background: var(--gray-800);
             padding: 1.5rem;
-            border-radius: 15px;
-            
+            border-radius: 15px;            
+        }
+
+        a { 
+            color: var(--white);
         }
 
     }
