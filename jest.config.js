@@ -1,10 +1,8 @@
 module.exports = { 
   // pastas que devem ser ignoradas porque não vão conter testes
-  testIgnorePatterns: ["/node_modules/", "/.next/"], 
+  testPathIgnorePatterns: ["/node_modules/", "/.next/"], 
   // arquivos que devem ser executados pelo jest
-  setupFilesAfterEnv: [
-    "<roodDir>/src/tests/setupTests.ts"
-  ],
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setupTests.ts'],
   // define como serão os arquivos em typescript convertidos
   // isso é necessário porque o jest não reconhece o typescript
   transform: { 
@@ -17,5 +15,5 @@ module.exports = {
   // ele vai usar isso para saber como simular o ambiente durante os testes
   // o jsdom é uma forma nativa de fazer isso
   // ele entrega para o jest o que está sendo exibido em tela porem em javascript
-  testEnvironment: 'jsdom'
+  testEnvironment: "jsdom"
 };
