@@ -11,6 +11,11 @@ module.exports = {
     // Apos os 2 pontos é informado o pacote que vai ser usado para a transformação
     "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest"
   }, 
+  moduleNameMapper: {
+    // informa que todos os arquivos que terminam com .scss, .css ou .sass
+    // dever ser traduzidos para o jest usando a biblioteca identity obj proxy
+    "\\.(scss|css|sass)$": "identity-obj-proxy"
+  }, 
   // informa que ambiente o jest está trabalhando
   // ele vai usar isso para saber como simular o ambiente durante os testes
   // o jsdom é uma forma nativa de fazer isso
