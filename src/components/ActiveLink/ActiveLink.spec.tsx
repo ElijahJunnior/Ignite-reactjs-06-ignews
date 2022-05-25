@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import { escape } from 'querystring';
 import { ActiveLink } from '.';
 
 // cria um mock para imitar um modulo - no caso do exemplo next/router
@@ -10,9 +9,9 @@ jest.mock('next/router', () => {
       return { 
         // retornando um valor para a função que seja conveniente para o teste
         asPath: '/'
-      }
+      };
     }
-  }
+  };
 })
 
 // cria uma descrição para um determinado grupo de testes
@@ -30,7 +29,7 @@ describe('ActiveLink component', () => {
       <ActiveLink href="/" activeClassName='active'>
         <a>Home</a>
       </ActiveLink>
-    )
+    );
     
     // busca um elemento dentro do documento que contenha o texto Home
     expect(getByText('Home')).toBeInTheDocument();
@@ -43,7 +42,7 @@ describe('ActiveLink component', () => {
       <ActiveLink href="/" activeClassName='active'>
         <a>Home</a>
       </ActiveLink>
-    )
+    );
   
     // verifica se o elemento contendo o texto HOME possui a classe ACTIVE
     expect(getByText('Home')).toHaveClass('active');
