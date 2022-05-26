@@ -36,10 +36,10 @@ describe('SubscribeButton component', () => {
       [null, false]
     );
 
-    // rendirizando o componente que será testado
+    // renderizando o componente que será testado
     render( <SubscribeButton />);
 
-    // buscando o butão pelo texto
+    // buscando o botão pelo texto
     const subscribeButton = screen.getByText('Subscribe Now');
 
     // disparando um click no botão 
