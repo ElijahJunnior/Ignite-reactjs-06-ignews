@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { ActiveLink } from '.';
+import { ActiveLink } from '../../components/ActiveLink';
 
 // cria um mock para imitar um modulo - no caso do exemplo next/router
 jest.mock('next/router', () => { 

@@ -1,12 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SubscribeButton } from '.';
+import { SubscribeButton } from '../../components/SubscribeButton';
 import { signIn, useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 
-// criando um mock da função referida informando oque será retornado
 jest.mock('next-auth/client');
-
-// criando um mock da função referida sem informar oque será retornado
 jest.mock('next/router')
 
 describe('SubscribeButton component', () => { 
@@ -45,7 +42,7 @@ describe('SubscribeButton component', () => {
     // disparando um click no botão 
     fireEvent.click(subscribeButton);
 
-    // verificando se apos o click a função signIn foi chamada
+    // verificando se após o click a função signIn foi chamada
     expect(signInMocked).toHaveBeenCalled();
 
   })
@@ -60,15 +57,15 @@ describe('SubscribeButton component', () => {
       expires: 'fake-expires'
     }, false]);
     
-    // criando uma istancia do mock da função useRouter
+    // criando uma instancia do mock da função useRouter
     const useRouterMocked = jest.mocked(useRouter);
     
     // criando uma função para ser usada como retorno do mock 
-    // de forma que sera possivel verificar se ela foi chamada 
+    // de forma que seja possível verificar se ela foi chamada 
     const pushMocked = jest.fn();
     
-    // setando no mock oque deve ser retornado 
-    // da proxima vez que a função for chamada
+    // definindo no mock o que deve ser retornado 
+    // da próxima vez que a função for chamada
     useRouterMocked.mockReturnValueOnce({ 
       push: pushMocked, 
     } as any)  

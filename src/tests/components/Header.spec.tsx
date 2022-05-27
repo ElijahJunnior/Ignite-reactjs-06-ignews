@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { Header } from '.';
+import { Header } from '../../components/Header';
 
 // cria um mock para imitar um modulo - no caso do exemplo next/router
 jest.mock('next/router', () => { 
