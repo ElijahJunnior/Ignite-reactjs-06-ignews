@@ -27,6 +27,7 @@ describe('Home Page', () => {
     
     const retrievePriceStripeMocked = jest.mocked(stripe.prices.retrieve)
 
+    // mockResolvedValueOnce determina que o objeto retornado será uma promisse
     retrievePriceStripeMocked.mockResolvedValueOnce({
       id: 'fake-price-id', 
       unit_amount: 1000, 
