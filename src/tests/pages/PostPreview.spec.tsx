@@ -23,8 +23,6 @@ describe('Post Preview Page', () => {
 
     useSessionMocked.mockReturnValueOnce([null, false])
 
-
-
     render(
       <Post post={post} />
     );

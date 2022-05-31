@@ -20,5 +20,16 @@ module.exports = {
   // ele vai usar isso para saber como simular o ambiente durante os testes
   // o jsdom é uma forma nativa de fazer isso
   // ele entrega para o jest o que está sendo exibido em tela porem em javascript
-  testEnvironment: "jsdom"
+  testEnvironment: "jsdom", 
+  // ativa o Coverage Report
+  collectCoverage: true, 
+  // define para quais arquivos o relatorio deve ser gerado e quais devem ser ignorados
+  collectCoverageFrom: [
+    "src/**/*.tsx", 
+    "!src/**/*.spec.tsx", 
+    "!src/**/_app.tsx", 
+    "!src/**/_document.tsx"
+  ], 
+  // define quais relatorios devem ser gerados
+  coverageReporters: ["lcov", "json"]
 };
