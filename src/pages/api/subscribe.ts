@@ -13,6 +13,26 @@ type User = {
     }
 }
 
+async function createStripeCustomer(id: string, email: string) { 
+    
+    // criando um cliente no stripe
+    const stripeCustomer = await stripe.customers.create({
+        email: email,
+        // metadata - verificar mais tarde
+    });
+    // gravando o stripeCustomerId para verificar se o usuario existe
+    await fauna.query(
+        q.Update(
+            q.Ref(q.Collection('users'), id), {
+            data: {
+                stripe_customer_id: stripeCustomer.id
+            }
+        })
+    );
+    // retornando o id do costumer no stripe
+    return stripeCustomer.id;
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     // validando o metodo da requisição feita pelo usuario
     if (req.method === 'POST') {
@@ -29,21 +49,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         );
         // verificando se o usuario já esta cadastrado no stripe
         if (!user.data.stripe_customer_id) {
-            // criando um cliente no stripe
-            const stripeCustomer = await stripe.customers.create({
-                email: session.user.email,
-                // metadata - verificar mais tarde
-            });
-            // gravando o stripeCustomerId para verificar se o usuario existe
-            await fauna.query(
-                q.Update(
-                    q.Ref(q.Collection('users'), user.ref.id), {
-                    data: {
-                        stripe_customer_id: stripeCustomer.id
-                    }
-                })
+            user.data.stripe_customer_id = await createStripeCustomer(
+                user.ref.id, session.user.email
             );
-            user.data.stripe_customer_id = stripeCustomer.id;
+        } else { 
+            const stripeCustomer =  await stripe.customers.retrieve(
+                user.data.stripe_customer_id
+            );
+            if(!stripeCustomer || stripeCustomer.deleted) { 
+                user.data.stripe_customer_id = await createStripeCustomer(
+                    user.ref.id, session.user.email 
+                );
+            }
         }
         // criando um checkout para o usuario
         const stripeCheckoutSession = await stripe.checkout.sessions.create({
